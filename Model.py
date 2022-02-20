@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense
@@ -6,10 +7,11 @@ from keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 
 
-def BuildModel(X_Train, Y_Train):
+def BuildModel(InitalTrainingSet,X_Train, Y_Train):
     regressor = Sequential()
+    print(f"{X_Train.shape=}\n{X_Train=}")
     # Adding the first LSTM layer and some Dropout regularisation
-    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+    regressor.add(LSTM(units = 20, return_sequences = True, input_shape = (X_Train.shape[1], 1)))
     regressor.add(Dropout(0.2))
     # Adding a second LSTM layer and some Dropout regularisation
     regressor.add(LSTM(units = 50, return_sequences = True))
@@ -31,18 +33,20 @@ def BuildModel(X_Train, Y_Train):
 
 
     dataset_test = pd.read_csv('TestData.csv')
-    real_stock_price = dataset_test.iloc[:, 1:2].values
+    Real_Guardrail = dataset_test.iloc[:, 1:2].values
     # Getting the predicted stock price of 2017
-    dataset_total = pd.concat((dataset_train['Open'], dataset_test['Open']), axis = 0)
+    dataset_total = pd.concat((InitalTrainingSet['Start'], dataset_test['Start']), axis = 0)
     inputs = dataset_total[len(dataset_total) - len(dataset_test) - 60:].values
     inputs = inputs.reshape(-1,1)
     Scaler = MinMaxScaler(feature_range = (0, 1))
-    inputs = Scaler.transform(inputs)
+    inputs = Scaler.fit_transform(inputs)
     X_test = []
     for i in range(60, 80):
         X_test.append(inputs[i-60:i, 0])
     X_test = np.array(X_test)
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-    predicted_stock_price = regressor.predict(X_test)
-    predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+    Predicted_Guardrail = regressor.predict(X_test)
+    Predicted_Guardrail = Scaler.inverse_transform(Predicted_Guardrail)
+
+    return(Real_Guardrail ,Predicted_Guardrail)
 

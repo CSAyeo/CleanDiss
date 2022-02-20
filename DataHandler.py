@@ -29,11 +29,12 @@ def Scaling(TrainSet):
 def TrainingStruct(TrainScaled):
     X_Train = []
     Y_Train = []
+    print("==========================================\n",TrainScaled, "==========================================\n")
     for i in range(60, len(TrainScaled)): #range (x,y)
         X_Train.append(TrainScaled[i-60:i, 0])
         Y_Train.append(TrainScaled[i, 0])
     X_Train, Y_Train = np.array(X_Train), np.array(Y_Train)
 
     # Reshaping
-    X_Train = np.reshape(X_Train, (X_Train.shape[0], X_Train.shape[1], 1))
+    print(f"{X_Train=}")
     return X_Train, Y_Train
