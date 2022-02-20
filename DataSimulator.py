@@ -28,7 +28,6 @@ def Inc(Years):
         StartList.append(round(Start))
         EndList.append(round(End))
     import pandas as pd
-    print(f"{StartList=}{EndList=}")
     YearRange = pd.date_range(start='1/1/2015', periods=Years, freq='A')
     df = pd.DataFrame(list(zip(StartList, EndList)), index = YearRange, columns=['Start', 'End'])
     df=genTest(df)
@@ -84,10 +83,10 @@ def Uniform(Years):
     print(df)
     return(df)
 
-def setTrain(df,x):
+def setTrain(df):
     print("Saving train...")
     df.index.name = 'Date'
-    df.to_csv("TrainData{}.csv".format(x))
+    df.to_csv("TrainData.csv")
 
 def setTest(df):
     print("Saving test...")
@@ -95,11 +94,7 @@ def setTest(df):
 
 def genTest(df):
     perc = int(df.shape[0]/10)
-    print(f"{perc=} \n {df.shape[0]}")
     test = df.tail(perc)
-    print(range(df.shape[0] - perc,df.shape[0]))
     df.drop(df.tail(perc).index,  inplace = True)
-    print("Test altered: ", df)
-    print("Test set: ", test)
     setTest(test)
     return df

@@ -7,22 +7,17 @@ from keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 
 
-def BuildModel(InitalTrainingSet,X_Train, Y_Train):
+def BuildModel(InitalTrainingSet,X_Train, Y_Train, DropoutRate, NodeCount, LayerCount):
     regressor = Sequential()
-    print(f"{X_Train.shape=}\n{X_Train=}")
     # Adding the first LSTM layer and some Dropout regularisation
-    regressor.add(LSTM(units = 20, return_sequences = True, input_shape = (X_Train.shape[1], 1)))
+    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_Train.shape[1], 1)))
     regressor.add(Dropout(0.2))
-    # Adding a second LSTM layer and some Dropout regularisation
-    regressor.add(LSTM(units = 50, return_sequences = True))
-    regressor.add(Dropout(0.2))
-    # Adding a third LSTM layer and some Dropout regularisation
-    regressor.add(LSTM(units = 50, return_sequences = True))
-    regressor.add(Dropout(0.2))
-    # Adding a fourth LSTM layer and some Dropout regularisation
-    regressor.add(LSTM(units = 50))
-    regressor.add(Dropout(0.2))
-    # Adding the output layer
+    print(NodeCount)
+    for x in range(LayerCount):
+        regressor.add(LSTM(units = NodeCount, return_sequences = True))
+        regressor.add(Dropout(DropoutRate))
+    regressor.add(LSTM(units = NodeCount))
+    regressor.add(Dropout(DropoutRate))
     regressor.add(Dense(units = 1))
     # Compiling the RNN
     regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
@@ -30,7 +25,6 @@ def BuildModel(InitalTrainingSet,X_Train, Y_Train):
     regressor.fit(X_Train, Y_Train, epochs = 100, batch_size = 32)
 
     #Results============================================================
-
 
     dataset_test = pd.read_csv('TestData.csv')
     Real_Guardrail = dataset_test.iloc[:, 1:2].values
